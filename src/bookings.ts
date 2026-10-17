@@ -3,14 +3,16 @@ import { bookingPrice } from "./pricing";
 import type { Booking, PaymentOutcome } from "./types";
 
 export async function payForBooking(booking: Booking, paymentMethodId: string): Promise<PaymentOutcome> {
-  const charge = await stripe.charges.create({
+  const intent = await stripe.paymentIntents.create({
     amount: bookingPrice(booking),
     currency: "usd",
     customer: booking.customerId,
-    source: paymentMethodId,
+    payment_method: paymentMethodId,
+    confirm: true,
+    automatic_payment_methods: { enabled: true, allow_redirects: "never" },
     description: `Bookly ${booking.serviceId} on ${booking.startsAt}`,
     metadata: { bookingId: booking.id },
   });
 
-  return { ok: charge.paid, id: charge.id };
+  return { ok: intent.status === "succeeded", id: intent.id };
 }
