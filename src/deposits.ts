@@ -8,6 +8,7 @@ export async function takeDeposit(booking: Booking, paymentMethodId: string): Pr
     currency: "usd",
     customer: booking.customerId,
     payment_method: paymentMethodId,
+    automatic_payment_methods: { enabled: true },
     description: `Bookly deposit for booking ${booking.id}`,
     metadata: { bookingId: booking.id, kind: "deposit" },
   });
